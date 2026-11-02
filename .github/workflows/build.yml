@@ -1,0 +1,38 @@
+
+name: Build Galaxy Liquid Lite
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract source
+        run: |
+          unzip -q GalaxyLiquidLite-source.zip
+          cd GalaxyLiquidLite
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build APKs
+        run: |
+          cd GalaxyLiquidLite
+          gradle :app:assembleDebug :app:assembleRelease
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: galaxy-liquid-apk
+          path: GalaxyLiquidLite/app/build/outputs/apk/**/*.apk
+          
